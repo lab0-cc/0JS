@@ -7,7 +7,10 @@ export const Shadow = Base => class extends Base {
 
     constructor() {
         super();
-        this.#shadow = this.attachShadow({ mode: 'open' });
+        if (this.shadowRoot === null)
+            this.#shadow = this.attachShadow({ mode: 'open' });
+        else
+            this.#shadow = this.shadowRoot;
     }
 
     appendToShadow(child) {
