@@ -41,9 +41,11 @@ export const Stylable = Base => class extends Shadow(Base) {
 // Component with dynamic shadow DOM
 export const DynamicShadow = Base => class extends Shadow(Base) {
     #childrenObserver;
+    #handlers;
 
     constructor() {
         super();
+        this.#handlers = [];
         this.#childrenObserver = new MutationObserver(() => this.#ready());
     }
 
@@ -56,6 +58,13 @@ export const DynamicShadow = Base => class extends Shadow(Base) {
     }
 
     #ready() {
-        [...this.children].forEach(e => this.appendToShadow(e));
+        [...this.children].forEach(e => {
+            this.appendToShadow(e);
+            this.#handlers.forEach(f => f(e));
+        });
+    }
+
+    addHandler(f) {
+        this.#handlers.push(f);
     }
 }
