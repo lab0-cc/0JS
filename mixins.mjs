@@ -83,4 +83,17 @@ export const Statusable = Base => class extends Base {
             this.dispatchEvent(new Event('statuschange', { bubbles: true }));
         }
     }
+
+    static get observedAttributes() {
+        return (super.observedAttributes ?? []).concat(['status']);
+    }
+
+    attributeChangedCallback(name, old, current) {
+        super.attributeChangedCallback?.(name, old, current);
+        switch (name) {
+            case 'status':
+                this.setStatus(parseInt(current));
+                break;
+        }
+    }
 }
