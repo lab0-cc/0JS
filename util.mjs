@@ -1,6 +1,7 @@
 // This module provides helper functions
 
 
+// Wrapper around document.createElement, with good properties
 export function createElement(tag, className=null, attributes={}, content=null) {
     const el = document.createElement(tag);
     if (className !== null)
