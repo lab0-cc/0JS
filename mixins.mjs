@@ -68,3 +68,19 @@ export const DynamicShadow = Base => class extends Shadow(Base) {
         this.#handlers.push(f);
     }
 }
+
+// Component with a reportable status
+export const Statusable = Base => class extends Base {
+    #status;
+
+    getStatus() {
+        return this.#status;
+    }
+
+    setStatus(status) {
+        if (this.#status !== status) {
+            this.#status = status;
+            this.dispatchEvent(new Event('statuschange', { bubbles: true }));
+        }
+    }
+}
