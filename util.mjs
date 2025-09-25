@@ -12,3 +12,8 @@ export function createElement(tag, className=null, attributes={}, content=null) 
         el.textContent = content;
     return el;
 }
+
+// Wrapper around the fetch API that expects JSON output
+export function jfetch(url, callback) {
+    return fetch(url).then(r => r.json().then(callback));
+}
