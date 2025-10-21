@@ -14,7 +14,7 @@ export const Shadow = Base => class extends Base {
     }
 
     appendToShadow(child) {
-        this.#shadow.appendChild(child);
+        return this.#shadow.appendChild(child);
     }
 }
 
