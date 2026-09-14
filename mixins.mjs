@@ -24,16 +24,43 @@ export const Stylable = Base => class extends Shadow(Base) {
 
     constructor() {
         super();
+        globalThis.loadedStyleSheets ??= new Map();
+        globalThis.pendingStyleSheets ??= new Map();
         this.#stylesheets = [];
     }
 
-    addStylesheet(url) {
-        if (!this.#stylesheets.includes(url)) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = `/css/${url}`;
-            this.appendToShadow(link);
-            this.#stylesheets.push(url);
+    async addStylesheet(url) {
+        return this.addStylesheets(url);
+    }
+
+    async addStylesheets(...urls) {
+        await Promise.all(urls.map(async (url) => {
+            if (globalThis.loadedStyleSheets.has(url))
+                return;
+            if (globalThis.pendingStyleSheets.has(url))
+                return globalThis.pendingStyleSheets.get(url);
+            const load = (async () => {
+                const res = await fetch(`/css/${url}`);
+                if (!res.ok)
+                    throw new Error(`Failed to load stylesheet ${url} (${res.status})`);
+                const css = await res.text();
+                const sheet = new CSSStyleSheet();
+                await sheet.replace(css);
+                globalThis.loadedStyleSheets.set(url, sheet);
+            })();
+            globalThis.pendingStyleSheets.set(url, load);
+            try {
+                await load;
+            } finally {
+                globalThis.pendingStyleSheets.delete(url);
+            }
+        }));
+
+        for (const url of urls) {
+             if (!this.#stylesheets.includes(url)) {
+                 this.shadowRoot.adoptedStyleSheets.push(globalThis.loadedStyleSheets.get(url));
+                 this.#stylesheets.push(url);
+             }
         }
     }
 }
