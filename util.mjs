@@ -18,6 +18,8 @@ export function createElements(...elements) {
     return elements.map(e => {
         if (typeof e === 'string')
             return createElement(e);
+        if (e instanceof Node)
+            return e;
         const { tag, className, attributes, content } = e;
         return createElement(tag, className, attributes, content);
     });
